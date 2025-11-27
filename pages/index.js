@@ -10,6 +10,44 @@ import matter from 'gray-matter'
 
 export default function Home({ posts = [] }){
   const [openDemo,setOpenDemo] = useState(false)
+  const [formLoading,setFormLoading] = useState(false)
+  const [modalLoading,setModalLoading] = useState(false)
+  const [pageError,setPageError] = useState('')
+  const [modalError,setModalError] = useState('')
+  const [successNotice,setSuccessNotice] = useState(false)
+
+  async function processEnquiry(event,setLoading,setError){
+    event.preventDefault()
+    setError('')
+    const form = event.currentTarget
+    const payload = Object.fromEntries(new FormData(form).entries())
+    setLoading(true)
+    try {
+      const res = await fetch('/api/enquiry',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      })
+      if(!res.ok) throw new Error('Failed to submit enquiry')
+      form.reset()
+      setSuccessNotice(true)
+      setOpenDemo(false)
+    } catch(err){
+      setError(err.message || 'Unable to submit enquiry. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handlePageFormSubmit = event => processEnquiry(event,setFormLoading,setPageError)
+  const handleModalFormSubmit = event => processEnquiry(event,setModalLoading,setModalError)
+
+  const handleSuccessClose = () => {
+    setSuccessNotice(false)
+    if(typeof window !== 'undefined'){
+      window.location.href = '/'
+    }
+  }
   const heroStats = [
     { label: 'Launch modules', value: '16+' },
     { label: 'Chains supported', value: '4' },
@@ -35,7 +73,7 @@ export default function Home({ posts = [] }){
           </div>
           <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12'>
             {heroStats.map(stat => (
-              <div key={stat.label} className='rounded-3xl border border-white/10 bg-white/5 backdrop-blur px-6 py-5 text-left text-white'>
+              <div key={stat.label} className='rounded-3xl border border-white/10 bg-white/5 backdrop-blur px-6 py-5 text-center text-white'>
                 <div className='text-3xl font-semibold'>{stat.value}</div>
                 <p className='text-xs uppercase tracking-[3px] text-slate-200 mt-1'>{stat.label}</p>
               </div>
@@ -91,6 +129,7 @@ export default function Home({ posts = [] }){
             <p className='text-xs uppercase tracking-[3px] text-rose-500 font-semibold'>Talk to us</p>
             <h2 className='text-4xl font-semibold mt-3 text-slate-900'>Build your next launch experience</h2>
             <p className='text-base text-slate-600 mt-4'>Share your roadmap and our enterprise desk will reply within one business day with tailored launchpad, liquidity, and analytics recommendations.</p>
+            <p className='text-base text-slate-600 mt-3'>From Rust and Move programs to Solidity modules, we align architecture, compliance, and automation against your performance KPIs so your team can focus on go-to-market.</p>
             <ul className='mt-6 space-y-3 text-sm text-slate-600'>
               <li className='flex items-start gap-3'>
                 <span className='text-rose-400 mt-1'>•</span>
@@ -106,7 +145,7 @@ export default function Home({ posts = [] }){
               </li>
             </ul>
           </div>
-          <form method='post' action='/api/enquiry' className='bg-white/90 backdrop-blur rounded-3xl p-8 border border-white/60 shadow-[0_40px_90px_rgba(244,114,182,0.25)] space-y-4'>
+          <form onSubmit={handlePageFormSubmit} className='bg-white/90 backdrop-blur rounded-3xl p-8 border border-white/60 shadow-[0_40px_90px_rgba(244,114,182,0.25)] space-y-4'>
             <div>
               <label className='text-sm text-slate-500 block mb-1'>Full name</label>
               <input name='name' className='form-input w-full !bg-white !border-slate-200 text-slate-900' placeholder='Jane Doe' required />
@@ -116,20 +155,89 @@ export default function Home({ posts = [] }){
               <input type='email' name='email' className='form-input w-full !bg-white !border-slate-200 text-slate-900' placeholder='team@company.com' required />
             </div>
             <div>
-              <label className='text-sm text-slate-500 block mb-1'>Organization</label>
-              <input name='company' className='form-input w-full !bg-white !border-slate-200 text-slate-900' placeholder='Dex Labs' />
+              <label className='text-sm text-slate-500 block mb-1'>Telegram handle</label>
+              <input name='telegram' className='form-input w-full !bg-white !border-slate-200 text-slate-900' placeholder='@dextoolbox' />
+            </div>
+            <div>
+              <label className='text-sm text-slate-500 block mb-1'>Mobile number</label>
+              <input name='phone' className='form-input w-full !bg-white !border-slate-200 text-slate-900' placeholder='+1 555 123 4567' />
             </div>
             <div>
               <label className='text-sm text-slate-500 block mb-1'>Project goals</label>
               <textarea name='message' rows='5' className='form-input w-full !bg-white !border-slate-200 text-slate-900' placeholder='Describe your launch timeline, chains, and KPIs' required></textarea>
             </div>
-            <button type='submit' className='btn-neon w-full'>Submit enquiry</button>
+            {pageError && <p className='text-sm text-rose-500'>{pageError}</p>}
+            <button type='submit' className='btn-neon w-full disabled:opacity-60 disabled:cursor-not-allowed' disabled={formLoading}>
+              {formLoading ? 'Submitting…' : 'Submit enquiry'}
+            </button>
           </form>
         </div>
       </section>
     </main>
     <Footer />
-    {openDemo && (<div className='fixed inset-0 flex items-center justify-center' style={{backdropFilter:'blur(6px)'}}><div className='card' style={{width:760}}><h3>Request a demo</h3><form method='post' action='/api/enquiry' className='grid gap-3 mt-4'><input name='name' className='form-input' placeholder='Your name' required/><input name='email' className='form-input' placeholder='Email' required/><textarea name='message' rows='5' className='form-input' placeholder='Project description' required/><div className='flex justify-end gap-3 mt-2'><button type='button' className='px-4 py-2 border rounded' onClick={()=>setOpenDemo(false)}>Close</button><button type='submit' className='btn-neon'>Send Request</button></div></form></div></div>)}
+    {openDemo && (
+      <div className='fixed inset-0 z-50 flex items-center justify-center px-4'>
+        <div className='absolute inset-0 bg-black/70 backdrop-blur-sm' onClick={()=>setOpenDemo(false)}></div>
+        <div className='relative w-full max-w-sm bg-white text-slate-900 rounded-[18px] shadow-[0_25px_70px_rgba(15,23,42,0.45)] overflow-hidden border border-slate-100'>
+          <div className='bg-gradient-to-r from-[#051947] via-[#0d2f75] to-[#1f51c4] text-white px-4 py-3 flex items-start justify-between'>
+            <div>
+              <p className='text-[10px] uppercase tracking-[4px] text-cyan-200 font-semibold'>Request demo</p>
+              <h3 className='text-lg font-semibold leading-tight mt-1'>DexToolbox enterprise desk</h3>
+              <p className='text-[10px] text-white/80 mt-0.5'>Share your launch scope for a guided walkthrough.</p>
+            </div>
+            <button type='button' onClick={()=>setOpenDemo(false)} className='text-white/80 hover:text-white text-lg leading-none'>✕</button>
+          </div>
+          <div className='p-4 sm:p-5'>
+            <form onSubmit={handleModalFormSubmit} className='space-y-3'>
+              <div className='grid gap-3 sm:grid-cols-2'>
+                <div>
+                  <label className='text-[11px] font-semibold text-slate-500 block mb-1'>Full name</label>
+                  <input name='name' className='form-input w-full' placeholder='Jane Doe' required />
+                </div>
+                <div>
+                  <label className='text-[11px] font-semibold text-slate-500 block mb-1'>Work email</label>
+                  <input type='email' name='email' className='form-input w-full' placeholder='team@company.com' required />
+                </div>
+              </div>
+              <div className='grid gap-3 sm:grid-cols-2'>
+                <div>
+                  <label className='text-[11px] font-semibold text-slate-500 block mb-1'>Telegram</label>
+                  <input name='telegram' className='form-input w-full' placeholder='@launch-ops' />
+                </div>
+                <div>
+                  <label className='text-[11px] font-semibold text-slate-500 block mb-1'>Phone</label>
+                  <input name='phone' className='form-input w-full' placeholder='+1 555 123 4567' />
+                </div>
+              </div>
+              <div>
+                <label className='text-[11px] font-semibold text-slate-500 block mb-1'>Project goals</label>
+                <textarea name='message' rows='2' className='form-input w-full' placeholder='Share launch scope, chains, timeline' required></textarea>
+              </div>
+              {modalError && <p className='text-xs text-rose-500'>{modalError}</p>}
+              <div className='flex gap-3 pt-1 text-sm'>
+                <button type='button' className='w-1/2 border border-slate-200 rounded-full py-2 font-semibold text-slate-600 hover:bg-slate-50' onClick={()=>setOpenDemo(false)}>Cancel</button>
+                <button type='submit' className='w-1/2 btn-neon py-2 disabled:opacity-60 disabled:cursor-not-allowed' disabled={modalLoading}>
+                  {modalLoading ? 'Sending…' : 'Book session'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    )}
+    {successNotice && (
+      <div className='fixed inset-0 z-[60] flex items-center justify-center px-4'>
+        <div className='absolute inset-0 bg-black/80 backdrop-blur-sm' onClick={handleSuccessClose}></div>
+        <div className='relative w-full max-w-sm bg-white text-slate-900 rounded-2xl shadow-[0_30px_80px_rgba(15,23,42,0.45)] p-6 text-center space-y-4'>
+          <div className='w-16 h-16 mx-auto rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center text-3xl'>✓</div>
+          <div>
+            <h3 className='text-2xl font-semibold'>Enquiry received</h3>
+            <p className='text-sm text-slate-600 mt-2'>Our enterprise desk will reach out within one business day. Thank you for choosing DexToolbox.</p>
+          </div>
+          <button className='btn-neon w-full' onClick={handleSuccessClose}>Close &amp; return home</button>
+        </div>
+      </div>
+    )}
   </>)
 }
 
