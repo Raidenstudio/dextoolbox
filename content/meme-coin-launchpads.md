@@ -1,5 +1,5 @@
 ---
-title: The Rise of Meme Coin Launchpads: How PumpFun Inspired Enterprise-Grade Solutions
+title: "The Rise of Meme Coin Launchpads: How PumpFun Inspired Enterprise-Grade Solutions"
 description: How PumpFun-style fair-launch engines evolved into DexToolbox enterprise infrastructure for compliant meme coin deployments.
 date: '2025-11-27'
 tags:
