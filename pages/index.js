@@ -1,0 +1,161 @@
+import Header from '../components/Header'
+import Footer from '../components/Footer'
+import ProductCard from '../components/ProductCard'
+import Link from 'next/link'
+import { useState } from 'react'
+import fs from 'fs'
+import path from 'path'
+import { products as productCatalog } from '../lib/products'
+import matter from 'gray-matter'
+
+export default function Home({ posts = [] }){
+  const [openDemo,setOpenDemo] = useState(false)
+  const heroStats = [
+    { label: 'Launch modules', value: '16+' },
+    { label: 'Chains supported', value: '4' },
+    { label: 'Audit-ready contracts', value: '120+' }
+  ]
+  return (<>
+    <div className='relative min-h-screen flex flex-col overflow-hidden bg-[#03091c]'>
+      <video autoPlay muted loop playsInline className='absolute inset-0 w-full h-full object-cover opacity-30'>
+        <source src="/your-video.mp4" type="video/mp4" />
+      </video>
+      <div className='absolute inset-0 bg-gradient-to-b from-[#01030b]/40 via-[#01030b]/80 to-[#020c2d]'></div>
+      <Header onOpen={()=>setOpenDemo(true)} />
+      <section className='relative z-10 flex-1 flex items-center py-16'>
+        <div className='w-full max-w-5xl mx-auto px-6 text-center space-y-8'>
+          <div className='text-xs uppercase tracking-[10px] text-cyan-200/80'>Enterprise web3 suite</div>
+          <h1 className='text-4xl md:text-6xl font-semibold text-white leading-[1.1]'>Launch, grow, and govern token ecosystems with DexToolbox.</h1>
+          <p className='text-lg md:text-xl text-slate-200/90 max-w-3xl mx-auto'>Modular launchpads, liquidity automation, compliance rails, and analytics crafted for exchanges, L2s, and fintech operators.</p>
+          <div className='flex flex-wrap gap-4 mt-8 justify-center'>
+            <button className='btn-neon px-8 py-3 text-base' onClick={()=>setOpenDemo(true)}>Request demo</button>
+            <Link href='#products' className='inline-flex items-center px-8 py-3 rounded-full border border-white/30 text-white text-sm font-semibold uppercase tracking-[2px] hover:bg-white/10 transition-colors'>
+              Explore products
+            </Link>
+          </div>
+          <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12'>
+            {heroStats.map(stat => (
+              <div key={stat.label} className='rounded-3xl border border-white/10 bg-white/5 backdrop-blur px-6 py-5 text-left text-white'>
+                <div className='text-3xl font-semibold'>{stat.value}</div>
+                <p className='text-xs uppercase tracking-[3px] text-slate-200 mt-1'>{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+    <main>
+      <section id='products' className='py-20 bg-slate-50 border-t border-slate-200'>
+        <div className='w-full max-w-[1600px] mx-auto px-4 lg:px-10'>
+          <div className='text-center max-w-3xl mx-auto space-y-3'>
+            <p className='text-xs uppercase tracking-[6px] text-cyan-600 font-semibold'>Modular stack</p>
+            <h2 className='section-title text-black'>DexToolbox product suite</h2>
+            <p className='text-base text-slate-600'>Enterprise-ready modules covering launch, liquidity, analytics, automation, and growth. Mix and match any stack for your ecosystem.</p>
+          </div>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 mt-12 justify-items-center'>
+            {productCatalog.map((product, index) => (
+              <Link key={product.slug} href={`/products/${product.slug}`} className='group flex justify-center w-full'>
+                <ProductCard index={index} {...product} />
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+      <section id='blog' className='py-20 bg-gradient-to-b from-white to-slate-50 border-t border-slate-200'>
+        <div className='w-full max-w-[1600px] mx-auto px-4 lg:px-10'>
+          <div className='flex flex-col gap-3'>
+            <p className='text-xs uppercase tracking-[6px] text-purple-500 font-semibold'>Editorial research</p>
+            <h2 className='section-title text-black'>Insights</h2>
+            <p className='text-base text-slate-600 max-w-3xl'>Signals, playbooks, and architecture breakdowns powering launchpads, liquidity, and compliance at scale.</p>
+          </div>
+          <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mt-10'>
+            {posts.slice(0,8).map(post => (
+              <Link key={post.slug} href={`/blog/${post.slug}`} className='group'>
+                <article className='h-full flex flex-col rounded-3xl border border-slate-200 bg-white shadow-[0_20px_55px_rgba(15,23,42,0.08)] overflow-hidden hover:-translate-y-1 transition-transform'>
+                  <div className='relative w-full h-40 overflow-hidden'>
+                    <img src={post.thumbnail} alt={post.title} className='w-full h-full object-cover transition-transform duration-300 group-hover:scale-105' loading='lazy' />
+                  </div>
+                  <div className='p-6 flex-1 flex flex-col'>
+                    <h3 className='font-semibold text-base capitalize leading-snug text-slate-900'>{post.title}</h3>
+                    <p className='text-xs text-slate-900 mt-3 flex items-center gap-2 font-semibold'>Read article <span aria-hidden='true'>→</span></p>
+                  </div>
+                </article>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+      <section className='py-20 border-t border-slate-200 text-slate-900 bg-gradient-to-br from-[#fef3f2] via-[#fffaf3] to-[#ecf7ff]'>
+        <div className='w-full max-w-[1600px] mx-auto px-4 lg:px-10 grid gap-12 lg:grid-cols-2 items-start'>
+          <div>
+            <p className='text-xs uppercase tracking-[3px] text-rose-500 font-semibold'>Talk to us</p>
+            <h2 className='text-4xl font-semibold mt-3 text-slate-900'>Build your next launch experience</h2>
+            <p className='text-base text-slate-600 mt-4'>Share your roadmap and our enterprise desk will reply within one business day with tailored launchpad, liquidity, and analytics recommendations.</p>
+            <ul className='mt-6 space-y-3 text-sm text-slate-600'>
+              <li className='flex items-start gap-3'>
+                <span className='text-rose-400 mt-1'>•</span>
+                White-glove onboarding across Solana, Sui, and EVM.
+              </li>
+              <li className='flex items-start gap-3'>
+                <span className='text-rose-400 mt-1'>•</span>
+                Compliance-ready tokenomics, vesting, and reporting.
+              </li>
+              <li className='flex items-start gap-3'>
+                <span className='text-rose-400 mt-1'>•</span>
+                Dedicated success pod for liquidity, growth, and monitoring.
+              </li>
+            </ul>
+          </div>
+          <form method='post' action='/api/enquiry' className='bg-white/90 backdrop-blur rounded-3xl p-8 border border-white/60 shadow-[0_40px_90px_rgba(244,114,182,0.25)] space-y-4'>
+            <div>
+              <label className='text-sm text-slate-500 block mb-1'>Full name</label>
+              <input name='name' className='form-input w-full !bg-white !border-slate-200 text-slate-900' placeholder='Jane Doe' required />
+            </div>
+            <div>
+              <label className='text-sm text-slate-500 block mb-1'>Work email</label>
+              <input type='email' name='email' className='form-input w-full !bg-white !border-slate-200 text-slate-900' placeholder='team@company.com' required />
+            </div>
+            <div>
+              <label className='text-sm text-slate-500 block mb-1'>Organization</label>
+              <input name='company' className='form-input w-full !bg-white !border-slate-200 text-slate-900' placeholder='Dex Labs' />
+            </div>
+            <div>
+              <label className='text-sm text-slate-500 block mb-1'>Project goals</label>
+              <textarea name='message' rows='5' className='form-input w-full !bg-white !border-slate-200 text-slate-900' placeholder='Describe your launch timeline, chains, and KPIs' required></textarea>
+            </div>
+            <button type='submit' className='btn-neon w-full'>Submit enquiry</button>
+          </form>
+        </div>
+      </section>
+    </main>
+    <Footer />
+    {openDemo && (<div className='fixed inset-0 flex items-center justify-center' style={{backdropFilter:'blur(6px)'}}><div className='card' style={{width:760}}><h3>Request a demo</h3><form method='post' action='/api/enquiry' className='grid gap-3 mt-4'><input name='name' className='form-input' placeholder='Your name' required/><input name='email' className='form-input' placeholder='Email' required/><textarea name='message' rows='5' className='form-input' placeholder='Project description' required/><div className='flex justify-end gap-3 mt-2'><button type='button' className='px-4 py-2 border rounded' onClick={()=>setOpenDemo(false)}>Close</button><button type='submit' className='btn-neon'>Send Request</button></div></form></div></div>)}
+  </>)
+}
+
+export async function getStaticProps(){
+  const contentDir = path.join(process.cwd(), 'content')
+  const files = fs.readdirSync(contentDir).filter(file => file.endsWith('.md'))
+  const thumbExtensions = ['jpg','jpeg','png','webp']
+
+  const posts = files.map(file => {
+    const slug = file.replace('.md','')
+    const filePath = path.join(contentDir, file)
+    const raw = fs.readFileSync(filePath, 'utf8')
+    const { data } = matter(raw)
+    const title = data?.title || slug.replace(/-/g,' ')
+    const frontmatterThumb = typeof data?.thumbnail === 'string' ? data.thumbnail : null
+
+    const existingAsset = thumbExtensions
+      .map(ext => ({ ext, fullPath: path.join(process.cwd(), 'public', 'blog', `${slug}.${ext}`) }))
+      .find(({ fullPath }) => fs.existsSync(fullPath))
+
+    const thumbnail = existingAsset
+      ? `/blog/${slug}.${existingAsset.ext}`
+      : frontmatterThumb || '/og-image.png'
+
+    return { slug, title, thumbnail }
+  })
+
+  return { props: { posts } }
+}

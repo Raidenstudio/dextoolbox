@@ -1,0 +1,1 @@
+export default async function handler(req,res){ const MONGO = process.env.MONGO_URI; const PG = process.env.PG_CONN; if(MONGO) return res.status(200).json({ok:true,db:'mongo'}); if(PG) return res.status(200).json({ok:true,db:'postgres'}); return res.status(400).json({ok:false,error:'No DB configured'}); }

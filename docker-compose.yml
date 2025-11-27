@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    ports: ['3000:3000']
+    environment:
+      - FORM_ENDPOINT=${FORM_ENDPOINT}
+      - MONGO_URI=${MONGO_URI}
+      - PG_CONN=${PG_CONN}
+  mongo:
+    image: mongo:6
+    ports: ['27017:27017']
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: dextoolbox
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: dextoolbox
+    ports: ['5432:5432']

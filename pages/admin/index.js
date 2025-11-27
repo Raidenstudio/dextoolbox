@@ -1,0 +1,2 @@
+import { useState } from 'react'
+export default function Admin(){ const [open,setOpen]=useState(false); return (<main className='container'><h1>Admin (Skeleton)</h1><p className='muted'>Connect NextAuth and DB to enable this dashboard.</p><div className='grid md:grid-cols-2 gap-6 mt-6'><div className='card'>Enquiries (connect DB)</div><div className='card'>Deployments & Metrics</div></div></main>) }
