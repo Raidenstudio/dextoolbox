@@ -1,12 +1,11 @@
+import Head from 'next/head'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import ProductCard from '../components/ProductCard'
 import Link from 'next/link'
 import { useState } from 'react'
-import fs from 'fs'
-import path from 'path'
 import { products as productCatalog } from '../lib/products'
-import matter from 'gray-matter'
+import { fetchBlogEntries } from '../lib/blogService'
 
 export default function Home({ posts = [] }){
   const [openDemo,setOpenDemo] = useState(false)
@@ -54,6 +53,32 @@ export default function Home({ posts = [] }){
     { label: 'Audit-ready contracts', value: '120+' }
   ]
   return (<>
+    <Head>
+      <title>Dextoolbox – Web3 Launchpad Suite | Meme Coin Launchpad, DEX, Bots &amp; Analytics</title>
+      <meta name='description' content='Dextoolbox is a complete Web3 ecosystem providing enterprise-grade launchpads, DEX frontends, volume bots, multi-wallet managers, liquidity lockers, analytics dashboards, and automation tools for Solana, Sui, BNB &amp; EVM chains.' />
+      <meta name='keywords' content='Web3 launchpad suite, meme coin launchpad, pumpfun clone, dexscreener clone, raydium fork, crypto volume bot, multi wallet bot, token generator, tokenomics factory, liquidity locker, Web3 admin dashboard, enterprise blockchain tools' />
+      <meta property='og:title' content='Dextoolbox – Complete Web3 Launchpad &amp; DEX Ecosystem' />
+      <meta property='og:description' content='Enterprise-grade tools for token launch, trading, analytics, bots, automation &amp; liquidity management.' />
+      <meta property='og:image' content='https://dextoolbox.com/og-image.png' />
+      <meta property='og:url' content='https://dextoolbox.com/' />
+      <meta property='og:type' content='website' />
+      <script
+        type='application/ld+json'
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: 'Dextoolbox',
+            url: 'https://dextoolbox.com',
+            logo: 'https://dextoolbox.com/logo.png',
+            sameAs: [
+              'https://twitter.com/dextoolbox',
+              'https://t.me/dextoolbox'
+            ]
+          })
+        }}
+      />
+    </Head>
     <div className='relative min-h-screen flex flex-col overflow-hidden bg-[#03091c]'>
       <video autoPlay muted loop playsInline className='absolute inset-0 w-full h-full object-cover opacity-30'>
         <source src="/your-video.mp4" type="video/mp4" />
@@ -242,28 +267,12 @@ export default function Home({ posts = [] }){
 }
 
 export async function getStaticProps(){
-  const contentDir = path.join(process.cwd(), 'content')
-  const files = fs.readdirSync(contentDir).filter(file => file.endsWith('.md'))
-  const thumbExtensions = ['jpg','jpeg','png','webp']
-
-  const posts = files.map(file => {
-    const slug = file.replace('.md','')
-    const filePath = path.join(contentDir, file)
-    const raw = fs.readFileSync(filePath, 'utf8')
-    const { data } = matter(raw)
-    const title = data?.title || slug.replace(/-/g,' ')
-    const frontmatterThumb = typeof data?.thumbnail === 'string' ? data.thumbnail : null
-
-    const existingAsset = thumbExtensions
-      .map(ext => ({ ext, fullPath: path.join(process.cwd(), 'public', 'blog', `${slug}.${ext}`) }))
-      .find(({ fullPath }) => fs.existsSync(fullPath))
-
-    const thumbnail = existingAsset
-      ? `/blog/${slug}.${existingAsset.ext}`
-      : frontmatterThumb || '/og-image.png'
-
-    return { slug, title, thumbnail }
-  })
+  const entries = await fetchBlogEntries({ limit: 8 })
+  const posts = entries.map(post => ({
+    slug: post.slug,
+    title: post.title,
+    thumbnail: post.thumbnail
+  }))
 
   return { props: { posts } }
 }

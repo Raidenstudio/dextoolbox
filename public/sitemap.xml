@@ -1,6 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://dextoolbox.com</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
-  <url><loc>https://dextoolbox.com/products</loc><priority>0.8</priority></url>
-  <url><loc>https://dextoolbox.com/blog</loc><priority>0.6</priority></url>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+
+<url>
+  <loc>https://dextoolbox.com/</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/products/meme-coin-launchpad</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/products/token-generator-factory</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/products/dex-frontend-fork</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/products/realtime-charting-dashboard</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/products/volume-bot-system</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/products/sniper-bot</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/products/multi-wallet-manager</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/products/liquidity-locker</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/products/token-vesting-dashboard</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/products/admin-analytics-dashboard</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/products/telegram-mini-apps</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/products/marketing-toolkit</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/products/cross-chain-bridge</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/products/launchpad-aggregator</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/products/nft-launchpad</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/blog/dexscreener-architecture</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/blog/enterprise-launchpads</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/blog/meme-coin-launchpads</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/blog/multi-chain-strategy</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/blog/seo-for-launchpads</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://dextoolbox.com/blog/volume-bots-safety</loc>
+  <lastmod>2025-11-28T11:07:09+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+
+
 </urlset>

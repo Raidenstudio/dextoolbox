@@ -1,8 +1,314 @@
 import { useState } from 'react'
+import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
 import { products, getProductBySlug } from '../../lib/products'
+import { productSEO } from '../../lib/seoProducts'
+
+const productSchemas = {
+  'meme-coin-launchpad': {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Meme Coin Launchpad',
+    url: 'https://dextoolbox.com/products/meme-coin-launchpad',
+    image: 'https://dextoolbox.com/og-products/meme-coin-launchpad.png',
+    applicationCategory: 'Web3 Token Launch Platform',
+    operatingSystem: 'Web',
+    description: 'A PumpFun-style meme coin launchpad engine with bonding curves, instant liquidity creation, anti-bot protection, and automated token launch mechanics for Solana, Sui, BNB, and EVM chains.',
+    brand: {
+      '@type': 'Brand',
+      name: 'Dextoolbox'
+    },
+    offers: {
+      '@type': 'Offer',
+      price: 'Custom',
+      priceCurrency: 'USD',
+      url: 'https://dextoolbox.com/contact'
+    }
+  },
+  'token-generator-factory': {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Token Generator Factory',
+    url: 'https://dextoolbox.com/products/token-generator-factory',
+    image: 'https://dextoolbox.com/og-products/token-generator-factory.png',
+    applicationCategory: 'Web3 Token Creation Tool',
+    operatingSystem: 'Web',
+    description: 'A one-click token creation engine supporting SPL, ERC-20, BEP-20, and SUI tokens with automated tokenomics, reflections, taxes, burns, LP auto-lock, and supply control for enterprise Web3 projects.',
+    brand: {
+      '@type': 'Brand',
+      name: 'Dextoolbox'
+    },
+    offers: {
+      '@type': 'Offer',
+      price: 'Custom',
+      priceCurrency: 'USD',
+      url: 'https://dextoolbox.com/contact'
+    }
+  },
+  'dex-frontend-fork': {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'DEX Frontend',
+    url: 'https://dextoolbox.com/products/dex-frontend-fork',
+    image: 'https://dextoolbox.com/og-products/dex-frontend-fork.png',
+    applicationCategory: 'Web3 DEX Interface',
+    operatingSystem: 'Web',
+    description: 'A Raydium-style AMM swap and liquidity management frontend with wallet integration, live charts, liquidity positions, farms, pools, and ecosystem branding support.',
+    brand: {
+      '@type': 'Brand',
+      name: 'Dextoolbox'
+    },
+    offers: {
+      '@type': 'Offer',
+      price: 'Custom',
+      priceCurrency: 'USD',
+      url: 'https://dextoolbox.com/contact'
+    }
+  },
+  'realtime-charting-dashboard': {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Real-Time Charting Dashboard',
+    url: 'https://dextoolbox.com/products/realtime-charting-dashboard',
+    image: 'https://dextoolbox.com/og-products/realtime-charting-dashboard.png',
+    applicationCategory: 'Crypto Analytics Platform',
+    operatingSystem: 'Web',
+    description: 'A DexScreener-style multi-chain analytics dashboard with real-time charts, liquidity tracking, price feeds, token discovery, and integrated DEX data streams for Solana, Sui, BNB and EVM.',
+    brand: {
+      '@type': 'Brand',
+      name: 'Dextoolbox'
+    },
+    offers: {
+      '@type': 'Offer',
+      price: 'Custom',
+      priceCurrency: 'USD',
+      url: 'https://dextoolbox.com/contact'
+    }
+  },
+  'volume-bot-system': {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Volume Bot System',
+    url: 'https://dextoolbox.com/products/volume-bot-system',
+    image: 'https://dextoolbox.com/og-products/volume-bot-system.png',
+    applicationCategory: 'Trading Automation Software',
+    operatingSystem: 'Web',
+    description: 'A realistic multi-wallet crypto volume bot system for generating organic trading activity, liquidity stimulation, behavioral patterns, and early token traction on Solana, Sui, BNB, and EVM DEXes.',
+    brand: {
+      '@type': 'Brand',
+      name: 'Dextoolbox'
+    },
+    offers: {
+      '@type': 'Offer',
+      price: 'Custom',
+      priceCurrency: 'USD',
+      url: 'https://dextoolbox.com/contact'
+    }
+  },
+  'sniper-bot': {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Sniper Bot',
+    url: 'https://dextoolbox.com/products/sniper-bot',
+    image: 'https://dextoolbox.com/og-products/sniper-bot.png',
+    applicationCategory: 'High-Speed Trading Bot',
+    operatingSystem: 'Web',
+    description: 'A high-speed token sniper bot with instant launch buys, mempool tracking, slippage guard, anti-rug detection, auto-sell automation, and multi-wallet execution.',
+    brand: {
+      '@type': 'Brand',
+      name: 'Dextoolbox'
+    },
+    offers: {
+      '@type': 'Offer',
+      price: 'Custom',
+      priceCurrency: 'USD',
+      url: 'https://dextoolbox.com/contact'
+    }
+  },
+  'multi-wallet-manager': {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Multi-Wallet Manager',
+    url: 'https://dextoolbox.com/products/multi-wallet-manager',
+    image: 'https://dextoolbox.com/og-products/multi-wallet-manager.png',
+    applicationCategory: 'Wallet Management Software',
+    operatingSystem: 'Web',
+    description: 'An enterprise multi-wallet manager for creating, organizing, and automating thousands of wallets for trading campaigns, airdrops, liquidity distribution, and automation jobs.',
+    brand: {
+      '@type': 'Brand',
+      name: 'Dextoolbox'
+    },
+    offers: {
+      '@type': 'Offer',
+      price: 'Custom',
+      priceCurrency: 'USD',
+      url: 'https://dextoolbox.com/contact'
+    }
+  },
+  'liquidity-locker': {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Liquidity Locker',
+    url: 'https://dextoolbox.com/products/liquidity-locker',
+    image: 'https://dextoolbox.com/og-products/liquidity-locker.png',
+    applicationCategory: 'Crypto Security Tool',
+    operatingSystem: 'Web',
+    description: 'A secure multi-chain LP locker for locking liquidity tokens with decentralized proof, unlock schedules, and trust-building public verification pages.',
+    brand: {
+      '@type': 'Brand',
+      name: 'Dextoolbox'
+    },
+    offers: {
+      '@type': 'Offer',
+      price: 'Custom',
+      priceCurrency: 'USD',
+      url: 'https://dextoolbox.com/contact'
+    }
+  },
+  'token-vesting-dashboard': {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Token Vesting Dashboard',
+    url: 'https://dextoolbox.com/products/token-vesting-dashboard',
+    image: 'https://dextoolbox.com/og-products/token-vesting-dashboard.png',
+    applicationCategory: 'Web3 Vesting Platform',
+    operatingSystem: 'Web',
+    description: 'An enterprise-grade token vesting dashboard with cliffs, linear unlocks, multi-wallet allocation, investor transparency, and audit-friendly reporting across Solana, Sui, BNB, and EVM ecosystems.',
+    brand: {
+      '@type': 'Brand',
+      name: 'Dextoolbox'
+    },
+    offers: {
+      '@type': 'Offer',
+      price: 'Custom',
+      priceCurrency: 'USD',
+      url: 'https://dextoolbox.com/contact'
+    }
+  },
+  'admin-analytics-dashboard': {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Admin Analytics Dashboard',
+    url: 'https://dextoolbox.com/products/admin-analytics-dashboard',
+    image: 'https://dextoolbox.com/og-products/admin-analytics-dashboard.png',
+    applicationCategory: 'Web3 Admin Panel',
+    operatingSystem: 'Web',
+    description: 'A complete Web3 admin control center with token analytics, liquidity movement tracking, wallet behavior mapping, project monitoring, and operational insights for launchpad ecosystems.',
+    brand: {
+      '@type': 'Brand',
+      name: 'Dextoolbox'
+    },
+    offers: {
+      '@type': 'Offer',
+      price: 'Custom',
+      priceCurrency: 'USD',
+      url: 'https://dextoolbox.com/contact'
+    }
+  },
+  'telegram-mini-apps': {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Telegram Mini Apps & Bots',
+    url: 'https://dextoolbox.com/products/telegram-mini-apps',
+    image: 'https://dextoolbox.com/og-products/telegram-mini-apps.png',
+    applicationCategory: 'Web3 Community Automation',
+    operatingSystem: 'Web',
+    description: 'Telegram mini apps and automation bots for Web3 communities, providing trading alerts, airdrop handlers, reward systems, campaign tracking, and integration with token ecosystems.',
+    brand: {
+      '@type': 'Brand',
+      name: 'Dextoolbox'
+    },
+    offers: {
+      '@type': 'Offer',
+      price: 'Custom',
+      priceCurrency: 'USD',
+      url: 'https://dextoolbox.com/contact'
+    }
+  },
+  'marketing-toolkit': {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Web3 Marketing Toolkit',
+    url: 'https://dextoolbox.com/products/marketing-toolkit',
+    image: 'https://dextoolbox.com/og-products/marketing-toolkit.png',
+    applicationCategory: 'Web3 Growth Software',
+    operatingSystem: 'Web',
+    description: 'A comprehensive Web3 marketing toolkit with growth analytics, influencer dashboards, automated publishing, social campaigns, community monitoring, and project visibility boosters.',
+    brand: {
+      '@type': 'Brand',
+      name: 'Dextoolbox'
+    },
+    offers: {
+      '@type': 'Offer',
+      price: 'Custom',
+      priceCurrency: 'USD',
+      url: 'https://dextoolbox.com/contact'
+    }
+  },
+  'cross-chain-bridge': {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Cross-Chain Bridge',
+    url: 'https://dextoolbox.com/products/cross-chain-bridge',
+    image: 'https://dextoolbox.com/og-products/cross-chain-bridge.png',
+    applicationCategory: 'Web3 Interoperability Software',
+    operatingSystem: 'Web',
+    description: 'A secure cross-chain bridge module enabling token transfer between Solana, Sui, BNB, and EVM networks with wrapped assets, validator proofs, message relayers, and chain-syncing logic.',
+    brand: {
+      '@type': 'Brand',
+      name: 'Dextoolbox'
+    },
+    offers: {
+      '@type': 'Offer',
+      price: 'Addon',
+      priceCurrency: 'USD',
+      url: 'https://dextoolbox.com/contact'
+    }
+  },
+  'launchpad-aggregator': {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Launchpad Aggregator',
+    url: 'https://dextoolbox.com/products/launchpad-aggregator',
+    image: 'https://dextoolbox.com/og-products/launchpad-aggregator.png',
+    applicationCategory: 'Web3 Token Discovery Tool',
+    operatingSystem: 'Web',
+    description: 'A multi-platform launchpad aggregator showcasing tokens across PumpFun-like platforms, bonding-curve launchpads, and multi-chain incubators with trending metrics and discovery filters.',
+    brand: {
+      '@type': 'Brand',
+      name: 'Dextoolbox'
+    },
+    offers: {
+      '@type': 'Offer',
+      price: 'Custom',
+      priceCurrency: 'USD',
+      url: 'https://dextoolbox.com/contact'
+    }
+  },
+  'nft-launchpad': {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'NFT Launchpad',
+    url: 'https://dextoolbox.com/products/nft-launchpad',
+    image: 'https://dextoolbox.com/og-products/nft-launchpad.png',
+    applicationCategory: 'NFT Minting Platform',
+    operatingSystem: 'Web',
+    description: 'A professional NFT launchpad supporting presales, whitelist minting, reveal mechanisms, metadata hosting, collection management, and multi-chain minting for Solana, Sui, EVM NFTs.',
+    brand: {
+      '@type': 'Brand',
+      name: 'Dextoolbox'
+    },
+    offers: {
+      '@type': 'Offer',
+      price: 'Custom',
+      priceCurrency: 'USD',
+      url: 'https://dextoolbox.com/contact'
+    }
+  }
+}
 
 const detailContent = {
   'meme-coin-launchpad': {
@@ -163,6 +469,32 @@ const detailContent = {
     extendedThought: [
       'The future of meme coin launchpads lies in bridging community excitement with enterprise credibility. As regulators tighten oversight, projects must adopt audit-ready smart contracts and compliance-ready tokenomics generators. Enterprises that embrace Web3 infrastructure early will gain competitive advantage, attracting both retail communities and institutional investors.',
       'The Dextoolbox Launchpad positions itself as more than a PumpFun clone script. It is a premium enterprise blockchain solution that integrates liquidity lockers, multi-chain deployment, and analytics dashboards. By combining technical sophistication with SEO-optimized visibility, it ensures projects not only launch successfully but also scale sustainably.'
+    ],
+    qna: [
+      {
+        question: 'How quickly can we launch a meme coin with this platform?',
+        answer: 'Most teams configure bonding-curve parameters and deploy audited contracts in under an hour because presets cover PumpFun-style flows, liquidity routing, and branding assets.'
+      },
+      {
+        question: 'Does the launchpad help prevent bots and snipers?',
+        answer: 'Yes, transaction throttling, wallet whitelists, and MEV-aware guardrails dramatically reduce sniping so retail buyers get fair allocations.'
+      },
+      {
+        question: 'Can we deploy to multiple chains from one dashboard?',
+        answer: 'You can ship identical launches to Solana, Sui, BNB, and other EVM chains with shared tokenomics templates and automated liquidity locks.'
+      },
+      {
+        question: 'What analytics do operators receive after launch?',
+        answer: 'Real-time dashboards track bonding-curve progress, holder concentration, liquidity depth, and compliance logs for every chain.'
+      },
+      {
+        question: 'Is the platform suited for enterprises or just meme projects?',
+        answer: 'It was built for institutional desks, so you get audit-ready contracts, role-based governance, vesting, and reporting while still supporting community experiments.'
+      },
+      {
+        question: 'How are liquidity and LP tokens handled?',
+        answer: 'Liquidity is automatically routed to Raydium, Pancake, or Cetus, and LP tokens can be locked through the integrated trust stack to signal long-term commitment.'
+      }
     ],
     callToAction: 'Ready to launch your next meme coin or community token with enterprise-grade infrastructure? The Dextoolbox Launchpad combines fair-launch mechanics, instant liquidity, anti-bot protections, and compliance modules to deliver a premium experience for both communities and enterprises. Contact us today for a demo and discover how Dextoolbox can power your token ecosystem.'
   },
@@ -346,6 +678,32 @@ const detailContent = {
       'Token design has matured from ad-hoc contract drops into a discipline that blends economics, governance, compliance, and engineering. Winners treat tokenomics generation like enterprise software: versioned, tested, and governed.',
       'Multi-chain reality demands respecting Solana, Sui, and BNB/EVM differences while unifying lifecycle management—templates, tests, deployments, analytics, and governance—into one operating model.',
       'Compliance is no longer optional. Embedding vesting transparency, policy registries, and audit trails at the factory level transforms token creation into repeatable, controlled production ready for institutional partnerships.'
+    ],
+    qna: [
+      {
+        question: 'What token standards can the factory deploy?',
+        answer: 'You can launch SPL, ERC-20, BEP-20, Move, and custom templates with mint, burn, permit, and governance extensions already wired.'
+      },
+      {
+        question: 'Does it include visual tooling for tokenomics?',
+        answer: 'A browser-based designer lets you model emissions, vesting, supply splits, and taxes with guardrails that prevent invalid math.'
+      },
+      {
+        question: 'How are compliance requirements handled?',
+        answer: 'Policy registries, KYC/AML gates, and audit logs are built in so regulated teams can document every allocation or mint change.'
+      },
+      {
+        question: 'Can we export or version-control the contracts?',
+        answer: 'Every deployment delivers audited source, deterministic builds, and version metadata so DevOps teams can track upgrades safely.'
+      },
+      {
+        question: 'Is liquidity automation part of the package?',
+        answer: 'Yes, optional modules spin up bonding curves, liquidity lockers, and fee routing so tokens hit DEXs with healthy depth.'
+      },
+      {
+        question: 'How are cross-chain launches orchestrated?',
+        answer: 'A single workflow provisions tokens on Solana, Sui, and EVM networks with shared parameters, making multi-chain releases predictable.'
+      }
     ],
     callToAction: 'Ready to design and deploy tokens with transparent tokenomics, institutional trust, and multi-chain reach? Request a demo to see how the Dextoolbox Tokenomics Generator accelerates your roadmap with audit-ready smart contracts, governance controls, and compliance modules.'
   },
@@ -537,6 +895,32 @@ const detailContent = {
       'Institutional adoption depends on predictable operations and transparent policy—deny lists, timelocks, and audit trails professionalize decentralization.',
       'Executing across Solana, Sui, and BNB/EVM requires respecting each chain while presenting a unified, credible experience that compounds liquidity and brand strength.'
     ],
+    qna: [
+      {
+        question: 'What routing models does the frontend support?',
+        answer: 'It can orchestrate constant-product, stable swap, and concentrated liquidity pools with split-order routing for best execution.'
+      },
+      {
+        question: 'Can we match our brand guidelines?',
+        answer: 'Every module is themeable, from typography to pool cards, so exchanges can mirror Raydium-grade polish with their own identity.'
+      },
+      {
+        question: 'How are wallets integrated?',
+        answer: 'Phantom, Solflare, Sui Wallet, MetaMask, and WalletConnect adapters are bundled with intent-aware flows for swapping, staking, or creating pools.'
+      },
+      {
+        question: 'Does it expose LP lifecycle tooling?',
+        answer: 'Operators get guided flows for pool creation, concentrated range definition, incentive configuration, and treasury oversight.'
+      },
+      {
+        question: 'What observability is available for SRE teams?',
+        answer: 'Built-in health dashboards surface RPC latency, route success rates, TVL changes, and alert streams for incident response.'
+      },
+      {
+        question: 'Is the UI compliant-ready?',
+        answer: 'Policy registries, deny lists, and audit logs can be surfaced directly in the frontend so institutional LPs see governance transparency.'
+      }
+    ],
     callToAction: 'Ready to launch a branded swap and liquidity platform that feels premium and performs under pressure? Request a demo to see how the Dextoolbox DEX Frontend brings best-price routing, compliance views, and institutional UX to your ecosystem.'
   },
   'realtime-charting-dashboard': {
@@ -713,6 +1097,32 @@ const detailContent = {
       'Multi-chain, compliance-ready dashboards that merge real-time data with governance signals will attract institutional capital and community confidence.',
       'Embedding audit-ready smart contracts, liquidity lockers, and policy modules turns analytics from passive viewing into active ecosystem stewardship.'
     ],
+    qna: [
+      {
+        question: 'How fresh is the market data inside the dashboard?',
+        answer: 'Tick data streams over WebSockets with sub-second latency, while resilient polling keeps feeds alive when RPCs wobble.'
+      },
+      {
+        question: 'Can we monitor liquidity and volume across chains?',
+        answer: 'Yes, Solana, Sui, BNB, and EVM pools roll into unified TVL, volume, and liquidity health views with historical comparisons.'
+      },
+      {
+        question: 'Does it include discovery alerts for new tokens?',
+        answer: 'Discovery engines flag new pool creations, liquidity spikes, and trending velocity so analysts never miss emerging plays.'
+      },
+      {
+        question: 'How are compliance teams supported?',
+        answer: 'Every trade, liquidity change, and admin action is logged with exportable audit trails and anomaly detection for suspicious flows.'
+      },
+      {
+        question: 'Is the UI customizable for different personas?',
+        answer: 'Role-based layouts let traders, compliance officers, and executives pin the widgets and KPIs they care about most.'
+      },
+      {
+        question: 'Can insights be pushed to other systems?',
+        answer: 'Webhook and API connectors stream metrics into CRM, BI, or alerting stacks so growth, ops, and exec teams stay in sync.'
+      }
+    ],
     callToAction: 'Ready to deploy a real-time charting dashboard that combines DexScreener UX with enterprise reliability? Contact us for a demo and see how Dextoolbox powers analytics across Solana, Sui, BNB, and EVM.'
   },
   'volume-bot-system': {
@@ -875,6 +1285,32 @@ const detailContent = {
       'Volume bots have historically been associated with manipulation; responsible presence tooling flips that narrative by embedding guardrails and transparency.',
       'Automation, when governed and audited, becomes an accelerator for institutional adoption rather than a liability.',
       'In Web3, credibility equals liquidity—the systems that prove responsible automation will unlock durable growth.'
+    ],
+    qna: [
+      {
+        question: 'How human-like is the automated trading behavior?',
+        answer: 'Randomized order sizing, timing, and directional bias imitate organic wallets so exchanges see believable liquidity growth.'
+      },
+      {
+        question: 'Can we cap daily volume or budget?',
+        answer: 'Guardrails let you set notional caps, per-pair limits, and campaign budgets with circuit breakers that pause strategies instantly.'
+      },
+      {
+        question: 'What chains are supported?',
+        answer: 'Agent clusters can execute on Solana, Sui, BNB, and EVM venues simultaneously, all governed from one console.'
+      },
+      {
+        question: 'Do we get compliance evidence?',
+        answer: 'Every trade, pause event, and parameter change is logged with timestamps and tx hashes for regulators or internal audit.'
+      },
+      {
+        question: 'Can strategies react to liquidity depth?',
+        answer: 'The bots read pool depth and volatility before placing orders, ensuring spreads stay realistic and slippage is contained.'
+      },
+      {
+        question: 'How do we monitor performance in real time?',
+        answer: 'Dashboards visualize liquidity impact, win/loss ratios, and wallet rotations while sending alerts to Slack, PagerDuty, or email.'
+      }
     ],
     callToAction: 'Ready to deploy a volume bot system that creates traction responsibly? Contact us for a demo and see how Dextoolbox automation delivers human-like liquidity presence with compliance guardrails.'
   },
@@ -1046,6 +1482,32 @@ const detailContent = {
       'Sniper bots must evolve from unfair advantages into responsible automation governed by policy and transparency.',
       'Speed remains critical, but trust is the differentiator—guardrails, audits, and reporting turn automation into a strategic asset.',
       'When paired with Launchpad, Tokenomics, and Analytics, responsible sniping becomes part of a holistic go-to-market playbook.'
+    ],
+    qna: [
+      {
+        question: 'How does the bot detect launches so quickly?',
+        answer: 'It monitors mempools, token creation events, and liquidity adds at the block level, priming signed transactions before trading opens.'
+      },
+      {
+        question: 'Can we control slippage and exposure?',
+        answer: 'Each strategy enforces slippage caps, wallet quotas, and per-asset budgets so treasury risk is tightly managed.'
+      },
+      {
+        question: 'What protections exist against rugs or bad liquidity?',
+        answer: 'Liquidity depth checks, deny lists, and circuit breakers evaluate pools before committing capital and pause if anomalies pop up.'
+      },
+      {
+        question: 'Does it support multi-wallet execution?',
+        answer: 'Yes, you can rotate wallets, shard allocations, and run compliance modes for retail, institutional, or sandbox testing.'
+      },
+      {
+        question: 'How visible are execution results?',
+        answer: 'Real-time dashboards show fills, average entry price, PnL curves, and auto-sell executions so teams can iterate quickly.'
+      },
+      {
+        question: 'Is this acceptable for regulated entities?',
+        answer: 'Audit logs, role-based approvals, and policy registries document every decision so institutions can prove responsible automation.'
+      }
     ],
     callToAction: 'Ready to deploy a sniper bot system that captures opportunities responsibly? Contact us for a demo and discover how Dextoolbox automation delivers instant execution with compliance-grade safeguards.'
   },
@@ -1224,6 +1686,32 @@ const detailContent = {
       'Automation plus compliance unlocks institutional participation and community trust.',
       'Wallets are the arteries of liquidity—managing them responsibly is key to long-term success.'
     ],
+    qna: [
+      {
+        question: 'How many wallets can the system orchestrate?',
+        answer: 'Campaigns regularly handle tens of thousands of wallets because creation, encryption, and tagging are automated through bulk pipelines.'
+      },
+      {
+        question: 'Can we group wallets by campaign or compliance state?',
+        answer: 'Metadata tags and smart folders let you segment by airdrop cohort, liquidity pod, treasury ownership, or KYC level.'
+      },
+      {
+        question: 'Does it automate payouts and airdrops?',
+        answer: 'Schedulers run merkle proofs, quest rewards, and liquidity payouts with receipts that can be shared publicly.'
+      },
+      {
+        question: 'How secure is key storage?',
+        answer: 'Keys are encrypted with rotation policies and can plug into HSMs or external custody if you prefer hardware-backed security.'
+      },
+      {
+        question: 'What reporting is available for treasury teams?',
+        answer: 'Dashboards show balances, flow history, jurisdiction tags, and alerts for unusual movement so finance has instant visibility.'
+      },
+      {
+        question: 'Can policies block certain wallets from transacting?',
+        answer: 'Role-based governance and policy registries can freeze, approve, or timelock transactions before they hit chain.'
+      }
+    ],
     callToAction: 'Ready to deploy a multi-wallet manager that scales with your ecosystem? Contact us for a demo and discover how Dextoolbox orchestrates wallets with automation, compliance, and analytics.'
   },
   'liquidity-locker': {
@@ -1391,6 +1879,32 @@ const detailContent = {
       'Liquidity is the lifeblood of crypto projects but without trust it evaporates.',
       'Transparent, compliant lockers turn liquidity from a vulnerability into strength.',
       'In Web3, trust equals liquidity—lockers are the foundation of credible ecosystems.'
+    ],
+    qna: [
+      {
+        question: 'What can be locked with this product?',
+        answer: 'You can lock LP tokens, treasury tokens, or staged liquidity allocations with immutable conditions and governance-controlled extensions.'
+      },
+      {
+        question: 'How transparent are the locks for communities?',
+        answer: 'Public dashboards show lock amounts, unlock timers, and governance actions so investors always know the status.'
+      },
+      {
+        question: 'Can we support partial unlocks or phased releases?',
+        answer: 'Yes, schedules can include cliffs, partial unlock windows, or on-chain votes that extend lockups when milestones shift.'
+      },
+      {
+        question: 'Is compliance documentation included?',
+        answer: 'All lock events, signers, and policy references are logged with exportable reports for exchanges and regulators.'
+      },
+      {
+        question: 'Which chains are supported?',
+        answer: 'Solana, Sui, BNB, and EVM contracts share a consistent API so multi-chain ecosystems can present one trust center.'
+      },
+      {
+        question: 'How are emergency scenarios handled?',
+        answer: 'Timelocked emergency roles allow authorized committees to pause or extend locks, ensuring changes can’t be made unilaterally.'
+      }
     ],
     callToAction: 'Ready to secure your liquidity and build trust? Contact us for a demo and see how Dextoolbox locks LP tokens with compliance-grade transparency.'
   },
@@ -1560,6 +2074,32 @@ const detailContent = {
       'Transparent, compliant dashboards turn vesting into a strategic advantage.',
       'In Web3, vesting is governance—dashboards are the foundation of credible ecosystems.'
     ],
+    qna: [
+      {
+        question: 'What vesting schedules are supported?',
+        answer: 'Configure cliffs, linear releases, milestone unlocks, and revocable tranches with per-beneficiary metadata and notifications.'
+      },
+      {
+        question: 'Can investors see their unlock timelines?',
+        answer: 'Yes, beneficiaries get dashboards or shareable links that show upcoming releases, claim history, and policy notes.'
+      },
+      {
+        question: 'How do compliance teams review changes?',
+        answer: 'Every edit runs through role-based approvals with timelocks and audit logs so regulators can trace the full decision chain.'
+      },
+      {
+        question: 'Does it integrate with token contracts on multiple chains?',
+        answer: 'Solana, Sui, BNB, and EVM vesting programs share a governance layer so global teams stay aligned.'
+      },
+      {
+        question: 'What happens if a beneficiary needs to be revoked?',
+        answer: 'Policy-defined revocation flows claw back remaining tokens and redistribute them according to treasury rules, all on-chain.'
+      },
+      {
+        question: 'Can we export data for auditors?',
+        answer: 'CSV, JSON, and XBRL exports include signatures, transaction hashes, and approval notes for fast due diligence.'
+      }
+    ],
     callToAction: 'Ready to manage token vesting with transparency and compliance? Contact us for a demo and see how Dextoolbox automates schedules with investor-grade reporting.'
   },
   'admin-analytics-dashboard': {
@@ -1728,6 +2268,32 @@ const detailContent = {
       'Administration is the backbone of Web3 governance; without transparency it becomes a liability.',
       'Dashboards infused with policy registries and audit logs turn admin work into a strategic asset.',
       'In Web3, administration is governance—command centers are the foundation of credible ecosystems.'
+    ],
+    qna: [
+      {
+        question: 'What data sources feed the admin dashboard?',
+        answer: 'Token metrics, liquidity pools, vesting logs, governance proposals, and automation events are ingested through indexers and APIs.'
+      },
+      {
+        question: 'Can different teams see tailored views?',
+        answer: 'Role-based layouts let treasury, compliance, operations, and exec stakeholders pin the KPIs and alerts that matter to them.'
+      },
+      {
+        question: 'How are governance actions controlled?',
+        answer: 'Timelocks, approval workflows, and audit trails ensure sensitive changes follow policy and can be audited afterward.'
+      },
+      {
+        question: 'Does it support cross-chain monitoring?',
+        answer: 'Yes, Solana, Sui, BNB, and EVM telemetry funnel into unified widgets so multi-chain ecosystems get one command center.'
+      },
+      {
+        question: 'Can incidents trigger alerts?',
+        answer: 'Anomaly detection flags TVL drops, whale moves, or policy breaches and routes notifications to Slack, email, or PagerDuty.'
+      },
+      {
+        question: 'Is investor or partner access possible?',
+        answer: 'Read-only portals can be provisioned with scoped data so exchanges, LPs, or auditors can verify health without exposing controls.'
+      }
     ],
     callToAction: 'Ready to manage your ecosystem with transparency and compliance? Contact us for a demo and see how Dextoolbox centralizes admin analytics and governance.'
   },
@@ -1903,6 +2469,32 @@ const detailContent = {
       'Telegram is the operational backbone of crypto communities; branded, compliant mini-apps turn it into a true enterprise channel.',
       'Combining audit-ready contracts with community UX bridges the gap between grassroots engagement and institutional expectations.',
       'In Web3, community is liquidity—Telegram is where credibility is won or lost.'
+    ],
+    qna: [
+      {
+        question: 'What can the Telegram mini-apps actually do?',
+        answer: 'You can launch trading widgets, staking portals, governance voting, and referral quests directly inside Telegram without leaving the chat.'
+      },
+      {
+        question: 'How are airdrops or campaigns managed?',
+        answer: 'Automation bots validate wallet actions, issue rewards, and log every distribution with receipts your community can verify.'
+      },
+      {
+        question: 'Does it integrate with Solana, Sui, and EVM tools?',
+        answer: 'Yes, on-chain actions call the same audited contracts used across the DexToolbox stack so Telegram becomes a trusted operations surface.'
+      },
+      {
+        question: 'Can we maintain compliance while using bots?',
+        answer: 'Role-based permissions, KYC gating, and audit logs make it safe for regulated teams to run campaigns in public channels.'
+      },
+      {
+        question: 'How customizable is the UI?',
+        answer: 'Mini-app shells can be branded with your fonts, gradients, and CTAs so the experience feels native to your project.'
+      },
+      {
+        question: 'Do we get insights on engagement?',
+        answer: 'Analytics track completion rates, wallet conversions, region heatmaps, and retention so growth teams know what resonates.'
+      }
     ],
     callToAction: 'Ready to engage your community with Telegram mini-apps and bots? Contact us for a demo and see how Dextoolbox powers compliant, high-conversion community operations.'
   },
@@ -2088,6 +2680,32 @@ const detailContent = {
       'Audit-ready smart contracts and analytics dashboards turn marketing into a strategic advantage.',
       'In Web3, growth equals credibility—marketing is the bridge between innovation and adoption.'
     ],
+    qna: [
+      {
+        question: 'Which channels does the marketing toolkit cover?',
+        answer: 'You can coordinate paid ads, influencer pushes, SEO, referrals, and community campaigns from a single automation planner.'
+      },
+      {
+        question: 'Is attribution tracked across chains and funnels?',
+        answer: 'Yes, conversion pixels, wallet connections, and referral codes roll into multi-touch attribution so you know which efforts move TVL or sales.'
+      },
+      {
+        question: 'Can content be auto-published?',
+        answer: 'Editorial calendars schedule blog posts, email drops, tweets, and Telegram updates using approved templates and brand guidelines.'
+      },
+      {
+        question: 'How do influencer campaigns get managed?',
+        answer: 'Briefs, contracts, deliverables, and performance metrics live in one workspace, and payouts can be automated through the wallet manager.'
+      },
+      {
+        question: 'Does the toolkit integrate with analytics or CRM stacks?',
+        answer: 'Webhooks and native connectors push campaign data into HubSpot, Salesforce, Dune, or custom BI pipelines.'
+      },
+      {
+        question: 'What compliance features exist for marketing teams?',
+        answer: 'Approval workflows, region-based policies, and audit logs make sure every claim, creative, or incentive meets regulatory expectations.'
+      }
+    ],
     callToAction: 'Ready to amplify your project with enterprise-grade marketing automation? Contact us for a demo and see how Dextoolbox powers compliant growth across every channel.'
   },
   'cross-chain-bridge': {
@@ -2258,6 +2876,32 @@ const detailContent = {
       'When combined with governance and compliance, bridges become strategic assets rather than vulnerabilities.',
       'In Web3, interoperability equals scale—secure bridges are how ecosystems stay connected.'
     ],
+    qna: [
+      {
+        question: 'How are transfers secured across chains?',
+        answer: 'Lock-and-mint contracts, multi-sig or MPC validators, and optional zk proofs verify every transfer before wrapped assets are minted.'
+      },
+      {
+        question: 'Can compliance policies restrict destinations?',
+        answer: 'Policy registries enforce deny lists, KYC requirements, and per-asset quotas so only approved wallets receive bridged assets.'
+      },
+      {
+        question: 'What chains are supported out of the box?',
+        answer: 'Solana, Sui, BNB, and EVM family chains are wired today, and additional networks can be added via standardized deployment playbooks.'
+      },
+      {
+        question: 'How do users track transfer status?',
+        answer: 'Transparency dashboards show confirmations, validator signatures, wrapped supply, and incident alerts in real time.'
+      },
+      {
+        question: 'Can the bridge share liquidity data with other DexToolbox modules?',
+        answer: 'Yes, Launchpad, DEX, and Analytics suites can subscribe to bridge events to rebalance incentives or power discovery feeds.'
+      },
+      {
+        question: 'Is there support for insurance or risk controls?',
+        answer: 'Optional insurance, alerting, and pause controls integrate directly so operators can react quickly to chain events or exploits.'
+      }
+    ],
     callToAction: 'Ready to unlock liquidity mobility across ecosystems? Contact us for a demo and see how the Dextoolbox Cross-Chain Bridge delivers secure, compliant interoperability.'
   },
   'launchpad-aggregator': {
@@ -2426,6 +3070,32 @@ const detailContent = {
       'Discovery is the gateway to adoption; aggregators must be transparent, compliant, and governance-ready.',
       'Embedding audit-ready contracts and policy registries turns discovery into a strategic asset.',
       'In Web3, discovery equals growth—aggregators are the connective tissue for ecosystems.'
+    ],
+    qna: [
+      {
+        question: 'Which launchpads are indexed by default?',
+        answer: 'The aggregator watches PumpFun-style curves, bonding-curve launchpads, incubators, and premium enterprise desks across Solana, Sui, BNB, and EVM.'
+      },
+      {
+        question: 'How are credibility signals calculated?',
+        answer: 'Liquidity locks, audits, vesting dashboards, KYC badges, and on-chain behavior feed into a score that filters trustworthy launches.'
+      },
+      {
+        question: 'Can users customize discovery feeds?',
+        answer: 'Investors can filter by chain, sector, credibility tier, TVL growth, or incubation stage to surface exactly what they need.'
+      },
+      {
+        question: 'Does the aggregator push alerts?',
+        answer: 'Trending projects, unlock events, or compliance flags can notify Telegram, email, or Slack audiences automatically.'
+      },
+      {
+        question: 'How do governance teams manage listings?',
+        answer: 'Role-based approvals and timelocks ensure listing edits or takedowns follow policy, with full audit trails for accountability.'
+      },
+      {
+        question: 'Is there an API for partner portals?',
+        answer: 'Yes, a GraphQL/REST layer lets exchanges, wallets, or media sites embed curated launch feeds with minimal effort.'
+      }
     ],
     callToAction: 'Ready to unify token discovery across ecosystems? Contact us for a demo and see how the Dextoolbox Launchpad Aggregator delivers compliant, high-signal listings.'
   },
@@ -2615,6 +3285,9 @@ const defaultFlow = [
 
 export default function ProductDetail({ product }){
   const [openDemo,setOpenDemo] = useState(false)
+  const [demoLoading,setDemoLoading] = useState(false)
+  const [demoError,setDemoError] = useState('')
+  const [demoSuccess,setDemoSuccess] = useState(false)
   const content = detailContent[product?.slug]
   const highlightCards = content?.highlights || defaultHighlights
   const flowSteps = content?.flow || defaultFlow
@@ -2637,8 +3310,75 @@ export default function ProductDetail({ product }){
   if(!product){
     return null
   }
+  const seo = productSEO[product.slug] || {}
+  const metaTitle = seo.title || `${product.title} | DexToolbox`
+  const metaDescription = seo.description || content?.summary || product.desc
+  const canonicalUrl = `https://dextoolbox.com/products/${product.slug}`
+  const productSchema = productSchemas[product.slug]
+
+  const handleDemoClose = () => {
+    setOpenDemo(false)
+    setDemoError('')
+    setDemoSuccess(false)
+    setDemoLoading(false)
+  }
+
+  const handleDemoSubmit = async event => {
+    event.preventDefault()
+    setDemoError('')
+    const form = event.currentTarget
+    const formData = new FormData(form)
+    if(product?.title){
+      formData.set('product', product.title)
+    }
+    formData.set('source', product?.slug ? `product-detail:${product.slug}` : 'product-detail')
+    const payload = Object.fromEntries(formData.entries())
+    setDemoLoading(true)
+    try {
+      const res = await fetch('/api/enquiry',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      })
+      if(!res.ok){
+        throw new Error('Failed to submit demo request')
+      }
+      form.reset()
+      setDemoSuccess(true)
+    } catch(err){
+      setDemoError(err.message || 'Unable to submit demo request. Please try again.')
+    } finally {
+      setDemoLoading(false)
+    }
+  }
   return (
     <>
+      <NextSeo
+        title={metaTitle}
+        description={metaDescription}
+        canonical={canonicalUrl}
+        openGraph={{
+          title: metaTitle,
+          description: metaDescription,
+          url: canonicalUrl,
+          images: [
+            {
+              url: `https://dextoolbox.com/og-products/${product.slug}.png`,
+              width: 1200,
+              height: 630,
+              alt: metaTitle
+            }
+          ]
+        }}
+      />
+      {productSchema && (
+        <Head>
+          <script
+            type='application/ld+json'
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+          />
+        </Head>
+      )}
       <Header onOpen={()=>setOpenDemo(true)} />
       <main className='container py-16'>
         <Link href='/' className='text-xs uppercase tracking-[2px] muted'>← Back to all products</Link>
@@ -2796,7 +3536,21 @@ export default function ProductDetail({ product }){
                 <div className='card bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border-cyan-500/40'>
                   <h2 className='text-xl font-bold'>Launch with DexToolbox</h2>
                   <p className='muted mt-3'>{content.callToAction}</p>
-                  <button className='btn-neon mt-5' onClick={()=>setOpenDemo(true)}>Book a demo</button>
+                  <button className='btn-neon mt-5 mx-auto block text-center' onClick={()=>setOpenDemo(true)}>Book a demo</button>
+                </div>
+              )}
+
+              {content.qna?.length > 0 && (
+                <div className='card'>
+                  <h2 className='text-xl font-bold'>FAQ</h2>
+                  <div className='space-y-4 mt-4'>
+                    {content.qna.map(entry => (
+                      <div key={entry.question} className='border border-white/5 rounded-2xl p-4 bg-gradient-to-br from-white/5 to-transparent'>
+                        <p className='text-sm font-semibold text-white'>{entry.question}</p>
+                        <p className='muted text-sm mt-2'>{entry.answer}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -2821,18 +3575,58 @@ export default function ProductDetail({ product }){
       </main>
       <Footer />
       {openDemo && (
-        <div className='fixed inset-0 flex items-center justify-center' style={{backdropFilter:'blur(6px)'}}>
-          <div className='card' style={{width:760}}>
-            <h3>Request a demo</h3>
-            <form method='post' action='/api/enquiry' className='grid gap-3 mt-4'>
-              <input name='name' className='form-input' placeholder='Your name' required />
-              <input name='email' className='form-input' placeholder='Email' required />
-              <textarea name='message' rows='5' className='form-input' placeholder={`Tell us about ${product.title}`} required />
-              <div className='flex justify-end gap-3 mt-2'>
-                <button type='button' className='px-4 py-2 border rounded' onClick={()=>setOpenDemo(false)}>Close</button>
-                <button type='submit' className='btn-neon'>Send Request</button>
+        <div className='fixed inset-0 z-50 flex items-center justify-center px-4'>
+          <div className='absolute inset-0 bg-black/70 backdrop-blur-md' onClick={handleDemoClose}></div>
+          <div className='relative glass-modal w-full max-w-xl text-white space-y-4'>
+            <div className='flex items-start justify-between gap-4'>
+              <div>
+                <p className='text-[10px] uppercase tracking-[4px] text-cyan-200 font-semibold'>Request demo</p>
+                <h3 className='text-2xl font-semibold mt-1 leading-tight'>DexToolbox enterprise desk</h3>
+                <p className='text-sm text-white/70 mt-2'>Share a few launch details and our team will arrange a walkthrough.</p>
               </div>
-            </form>
+              <button type='button' className='text-white/60 hover:text-white text-xl leading-none' onClick={handleDemoClose}>✕</button>
+            </div>
+            {demoSuccess ? (
+              <div className='text-center space-y-4'>
+                <div className='w-16 h-16 mx-auto rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-3xl'>✓</div>
+                <div>
+                  <h4 className='text-xl font-semibold'>Request received</h4>
+                  <p className='text-sm text-white/70 mt-2'>Our enterprise desk will reach out shortly with next steps for {product.title}.</p>
+                </div>
+                <button className='btn-neon w-full' onClick={handleDemoClose}>Close</button>
+              </div>
+            ) : (
+              <form onSubmit={handleDemoSubmit} className='space-y-4'>
+                <div className='grid gap-3 sm:grid-cols-2'>
+                  <div>
+                    <label className='text-[11px] font-semibold text-white/70 block mb-1'>Full name</label>
+                    <input name='name' className='form-input' placeholder='Jane Doe' required />
+                  </div>
+                  <div>
+                    <label className='text-[11px] font-semibold text-white/70 block mb-1'>Work email</label>
+                    <input type='email' name='email' className='form-input' placeholder='team@company.com' required />
+                  </div>
+                </div>
+                <div className='grid gap-3 sm:grid-cols-2'>
+                  <div>
+                    <label className='text-[11px] font-semibold text-white/70 block mb-1'>Telegram</label>
+                    <input name='telegram' className='form-input' placeholder='@launch-ops' />
+                  </div>
+                  <div>
+                    <label className='text-[11px] font-semibold text-white/70 block mb-1'>Mobile number</label>
+                    <input type='tel' name='phone' className='form-input' placeholder='+1 555 123 4567' required />
+                  </div>
+                </div>
+                <div>
+                  <label className='text-[11px] font-semibold text-white/70 block mb-1'>Project goals</label>
+                  <textarea name='message' rows='3' className='form-input' placeholder={`Tell us about ${product.title}`} required></textarea>
+                </div>
+                {demoError && <p className='text-xs text-rose-400'>{demoError}</p>}
+                <button type='submit' className='btn-neon w-full disabled:opacity-60 disabled:cursor-not-allowed' disabled={demoLoading}>
+                  {demoLoading ? 'Sending…' : 'Send request'}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       )}

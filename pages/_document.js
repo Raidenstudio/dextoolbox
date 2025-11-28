@@ -7,6 +7,8 @@ class MyDocument extends Document {
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width,initial-scale=1" />
           <link rel="icon" href="/favicon.ico" />
+          <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon.png" />
+          <meta name="theme-color" content="#000000" />
           <meta name="description" content="DexToolbox — Enterprise Web3 product suite: launchpad, DEX, charts & bots. Multi-chain launches on SOL/SUI/BNB." />
           <meta property="og:site_name" content="DexToolbox" />
           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({

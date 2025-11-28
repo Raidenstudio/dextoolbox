@@ -1,21 +1,61 @@
-import fs from 'fs'
-import path from 'path'
-import matter from 'gray-matter'
-import { remark } from 'remark'
-import html from 'remark-html'
 import Link from 'next/link'
+import { NextSeo } from 'next-seo'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
+import { fetchBlogBySlug, fetchBlogSlugs } from '../../lib/blogService'
+import { blogSEO } from '../../lib/seoBlog'
+
+const blogMetaConfig = {
+	'dexscreener-architecture': {
+		title: 'DexScreener Architecture Explained – Real-Time Multi-Chain Analytics',
+		description: 'Deep dive into the architecture behind DexScreener-style charting and token analytics dashboards.'
+	},
+	'enterprise-launchpads': {
+		title: 'Enterprise Launchpads – Modern Token Launch Infrastructure',
+		description: 'Why enterprise-grade launchpads are powering the next generation of Web3 ecosystems.'
+	},
+	'meme-coin-launchpads': {
+		title: 'How Meme Coin Launchpads Work – PumpFun-Style Systems Explained'
+	},
+	'multi-chain-strategy': {
+		title: 'Multi-Chain Strategy for Web3 Projects – Solana, Sui, BNB & EVM'
+	},
+	'seo-for-launchpads': {
+		title: 'SEO for Web3 Launchpads – Ranking in a Hyper-Competitive Market'
+	},
+	'volume-bots-safety': {
+		title: 'Are Volume Bots Safe? A Technical Look at Web3 Trading Automation'
+	}
+}
 
 export default function Post({ content, meta }){
 	const formattedDate = meta.date ? new Date(meta.date).toLocaleDateString('en-US',{ month:'short', day:'numeric', year:'numeric' }) : null
 	const articleUrl = `https://dextoolbox.com/blog/${meta.slug}`
+	const seoOverride = blogMetaConfig[meta.slug] || {}
+	const pageTitle = seoOverride.title || meta.title
+	const summaryText = seoOverride.description || meta.description || meta.excerpt || 'DexToolbox editorial insights covering launchpads, analytics, bots, and automation.'
+	const heroImage = meta.thumbnail || meta.ogImage
+	const seoConfig = blogSEO(meta.slug, pageTitle, meta.excerpt || summaryText)
+	if(meta.ogImage){
+		seoConfig.openGraph = {
+			...seoConfig.openGraph,
+			images: [
+				{
+					url: meta.ogImage,
+					width: 1200,
+					height: 630,
+					alt: pageTitle
+				}
+			]
+		}
+	}
 	const shareTargets = [
 		{ label: 'Share on X', href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(meta.title)}&url=${encodeURIComponent(articleUrl)}` },
 		{ label: 'Share on LinkedIn', href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(articleUrl)}` }
 	]
 	return (
 		<>
+			<NextSeo {...seoConfig} />
 			<Header />
 			<main className='bg-[#020818] text-white'>
 				<div className='container max-w-6xl mx-auto py-16 space-y-10'>
@@ -26,7 +66,7 @@ export default function Post({ content, meta }){
 							<div className='relative space-y-4'>
 								<p className='kicker text-cyan-100/80'>DexToolbox editorial</p>
 								<h1 className='section-title text-4xl md:text-5xl leading-tight'>{meta.title}</h1>
-								{meta.description && <p className='muted text-base text-slate-200/90 max-w-3xl'>{meta.description}</p>}
+								{summaryText && <p className='muted text-base text-slate-200/90 max-w-3xl'>{summaryText}</p>}
 								<div className='flex flex-wrap gap-4 text-sm text-slate-200/80'>
 									{formattedDate && <span className='flex items-center gap-2'><span className='h-1.5 w-1.5 rounded-full bg-cyan-300/70' />{formattedDate}</span>}
 									{meta.readTime && <span className='flex items-center gap-2'><span className='h-1.5 w-1.5 rounded-full bg-purple-300/70' />{meta.readTime}</span>}
@@ -65,9 +105,9 @@ export default function Post({ content, meta }){
 							</div>
 						</div>
 					</div>
-					{meta.thumbnail && (
+					{heroImage && (
 						<div className='rounded-[32px] overflow-hidden border border-white/10 shadow-[0_35px_90px_rgba(3,8,20,0.7)]'>
-							<img src={meta.thumbnail} alt={meta.title} className='w-full h-[420px] object-cover' />
+							<img src={heroImage} alt={meta.title} className='w-full h-[420px] object-cover' />
 						</div>
 					)}
 					<div className='rounded-[32px] border border-white/10 bg-[#050e26] p-10 shadow-[0_35px_110px_rgba(2,6,23,0.75)]'>
@@ -81,40 +121,27 @@ export default function Post({ content, meta }){
 }
 
 export async function getStaticPaths(){
-	const dir = path.join(process.cwd(),'content')
-	const files = fs.readdirSync(dir).filter(f=>f.endsWith('.md'))
-	const paths = files.map(f=>({ params:{ slug: f.replace('.md','') } }))
+	const slugs = await fetchBlogSlugs()
+	const paths = slugs.map(slug => ({ params: { slug } }))
 	return { paths, fallback:false }
 }
 
 export async function getStaticProps({ params }){
-	const filePath = path.join(process.cwd(),'content', params.slug + '.md')
-	const raw = fs.readFileSync(filePath,'utf8')
-	const { content, data } = matter(raw)
-	const processed = await remark().use(html).process(content || '')
-	const publicBlogDir = path.join(process.cwd(),'public','blog')
-	const thumbExtensions = ['jpg','jpeg','png','webp']
-	const existingAsset = thumbExtensions
-		.map(ext => ({ ext, fullPath: path.join(publicBlogDir, `${params.slug}.${ext}`) }))
-		.find(({ fullPath }) => fs.existsSync(fullPath))
-	const thumbnail = existingAsset
-		? `/blog/${params.slug}.${existingAsset.ext}`
-		: (typeof data.thumbnail === 'string' ? data.thumbnail : null)
-	const tags = Array.isArray(data.tags)
-		? data.tags
-		: typeof data.tags === 'string'
-			? data.tags.split(',').map(tag => tag.trim()).filter(Boolean)
-			: []
-	const wordCount = content ? content.split(/\s+/).length : 0
-	const meta = {
-		title: data.title || params.slug.replace(/-/g,' '),
-		description: data.description || data.excerpt || '',
-		date: data.date || null,
-		tags,
-		thumbnail,
-		readTime: data.readTime || `${Math.max(1, Math.ceil(wordCount / 220))} min read`,
-		author: data.author || 'DexToolbox Research',
-		slug: params.slug
+	const post = await fetchBlogBySlug(params.slug)
+	if(!post){
+		return { notFound:true }
 	}
-	return { props:{ content: processed.toString(), meta } }
+	const meta = {
+		title: post.title,
+		description: post.description,
+		excerpt: post.excerpt,
+		date: post.publishedDate,
+		tags: post.tags,
+		thumbnail: post.thumbnail,
+		readTime: post.readTime,
+		author: post.author,
+		slug: post.slug,
+		ogImage: post.ogImage
+	}
+	return { props:{ content: post.body, meta } }
 }

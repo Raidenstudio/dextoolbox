@@ -1,6 +1,26 @@
 import { useEffect, useState } from 'react'
 
 const tabs = ['enquiries','blog','settings']
+const contentfulEnvVars = [
+	'CONTENTFUL_SPACE_ID',
+	'CONTENTFUL_ENVIRONMENT',
+	'CONTENTFUL_DELIVERY_TOKEN',
+	'CONTENTFUL_PREVIEW_TOKEN',
+	'CONTENTFUL_MANAGEMENT_TOKEN',
+	'CONTENTFUL_LOCALE'
+]
+
+const DEFAULT_BLOG_FORM = {
+	title:'',
+	slug:'',
+	description:'',
+	content:'',
+	tags:'',
+	thumbnail:'',
+	ogImage:'',
+	date:'',
+	author:''
+}
 
 export default function Admin(){
 	const [selected,setSelected] = useState('enquiries')
@@ -8,7 +28,7 @@ export default function Admin(){
 	const [enquiries,setEnquiries] = useState([])
 	const [posts,setPosts] = useState([])
 	const [settings,setSettings] = useState({ trackingScripts: '' })
-	const [blogForm,setBlogForm] = useState({ title:'', description:'', content:'', tags:'', thumbnail:'', date:'' })
+	const [blogForm,setBlogForm] = useState({...DEFAULT_BLOG_FORM})
 	const [loading,setLoading] = useState(false)
 	const [message,setMessage] = useState('')
 	const [loginForm,setLoginForm] = useState({ username:'', password:'' })
@@ -118,6 +138,13 @@ export default function Admin(){
 		try{
 			const payload = {
 				...blogForm,
+				slug: blogForm.slug?.trim() || undefined,
+				author: blogForm.author?.trim() || undefined,
+				thumbnail: blogForm.thumbnail?.trim() || '',
+				ogImage: blogForm.ogImage?.trim() || '',
+				description: blogForm.description?.trim() || '',
+				content: blogForm.content?.trim() || '',
+				date: blogForm.date || new Date().toISOString(),
 				tags: blogForm.tags ? blogForm.tags.split(',').map(tag => tag.trim()).filter(Boolean) : []
 			}
 			const res = await authedFetch('/api/admin/blog',{
@@ -125,8 +152,9 @@ export default function Admin(){
 				headers:{'Content-Type':'application/json'},
 				body: JSON.stringify(payload)
 			})
-			if(!res.ok) throw new Error('Failed to add blog post')
-			setBlogForm({ title:'', description:'', content:'', tags:'', thumbnail:'', date:'' })
+			const data = await res.json().catch(()=>({}))
+			if(!res.ok) throw new Error(data.error || 'Failed to add blog post')
+			setBlogForm({...DEFAULT_BLOG_FORM})
 			refreshData('blog')
 			setMessage('Blog post created')
 		}catch(err){
@@ -253,11 +281,18 @@ export default function Admin(){
 										<h2 className='text-2xl font-semibold mb-2'>Add blog post</h2>
 										<form className='grid gap-3' onSubmit={handleAddBlog}>
 											<input className='form-input' placeholder='Title' value={blogForm.title} onChange={e=>setBlogForm({...blogForm,title:e.target.value})} required />
-											<input className='form-input' placeholder='Description' value={blogForm.description} onChange={e=>setBlogForm({...blogForm,description:e.target.value})} />
-											<input className='form-input' placeholder='Thumbnail URL (optional)' value={blogForm.thumbnail} onChange={e=>setBlogForm({...blogForm,thumbnail:e.target.value})} />
-											<input className='form-input' placeholder='Tags (comma separated)' value={blogForm.tags} onChange={e=>setBlogForm({...blogForm,tags:e.target.value})} />
-											<textarea className='form-input' rows='6' placeholder='Markdown content' value={blogForm.content} onChange={e=>setBlogForm({...blogForm,content:e.target.value})} required />
-											<input className='form-input' placeholder='Publish date (YYYY-MM-DD)' value={blogForm.date} onChange={e=>setBlogForm({...blogForm,date:e.target.value})} />
+											<input className='form-input' placeholder='Slug (optional, auto-generated from title)' value={blogForm.slug} onChange={e=>setBlogForm({...blogForm,slug:e.target.value})} />
+											<input className='form-input' placeholder='SEO description / excerpt' value={blogForm.description} onChange={e=>setBlogForm({...blogForm,description:e.target.value})} />
+											<div className='grid md:grid-cols-2 gap-3'>
+												<input className='form-input' placeholder='Thumbnail URL' value={blogForm.thumbnail} onChange={e=>setBlogForm({...blogForm,thumbnail:e.target.value})} />
+												<input className='form-input' placeholder='OG image URL (optional)' value={blogForm.ogImage} onChange={e=>setBlogForm({...blogForm,ogImage:e.target.value})} />
+											</div>
+											<div className='grid md:grid-cols-2 gap-3'>
+												<input className='form-input' placeholder='Tags (comma separated)' value={blogForm.tags} onChange={e=>setBlogForm({...blogForm,tags:e.target.value})} />
+												<input className='form-input' placeholder='Author (optional)' value={blogForm.author} onChange={e=>setBlogForm({...blogForm,author:e.target.value})} />
+											</div>
+											<input className='form-input' placeholder='Publish date (YYYY-MM-DD or ISO)' value={blogForm.date} onChange={e=>setBlogForm({...blogForm,date:e.target.value})} />
+											<textarea className='form-input' rows='6' placeholder='Article body (Markdown or plain text)' value={blogForm.content} onChange={e=>setBlogForm({...blogForm,content:e.target.value})} required />
 											<button type='submit' className='btn-neon'>Create post</button>
 										</form>
 									</div>
@@ -270,6 +305,7 @@ export default function Admin(){
 														<div>
 															<p className='font-semibold'>{post.title}</p>
 															<p className='text-xs text-slate-400'>{post.slug}</p>
+															{post.date && <p className='text-[11px] text-slate-500'>Published {new Date(post.date).toLocaleDateString()}</p>}
 														</div>
 														<button className='text-sm text-rose-300 hover:text-rose-200' onClick={()=>handleDeletePost(post.slug)}>Delete</button>
 													</li>

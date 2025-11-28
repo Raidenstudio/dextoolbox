@@ -8,9 +8,14 @@
     "start": "next start -p 3000"
   },
   "dependencies": {
+    "@contentful/rich-text-html-renderer": "^17.1.6",
+    "@contentful/rich-text-plain-text-renderer": "^17.1.6",
+    "contentful": "^10.6.16",
+    "contentful-management": "^11.35.2",
     "ethers": "^6.8.0",
     "framer-motion": "^10.12.6",
     "gray-matter": "^4.0.3",
+    "next-seo": "^6.3.0",
     "next": "13.5.6",
     "next-auth": "^4.22.1",
     "nodemailer": "^7.0.11",

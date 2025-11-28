@@ -1,52 +1,81 @@
-import fs from 'fs'
-import path from 'path'
-import matter from 'gray-matter'
 import { verifyAdmin } from '../../../lib/admin'
+import { fetchBlogEntries } from '../../../lib/blogService'
+import { getManagementClient, getSpaceConfig } from '../../../lib/contentful'
 
-const contentDir = path.join(process.cwd(),'content')
+const { spaceId, environmentId, defaultLocale = 'en-US' } = getSpaceConfig()
 
-export default function handler(req,res){
+const richTextDocument = content => ({
+  nodeType: 'document',
+  data: {},
+  content: (content || '').split(/\n+/).map(line => ({
+    nodeType: 'paragraph',
+    data: {},
+    content: [
+      {
+        nodeType: 'text',
+        value: line,
+        marks: [],
+        data: {}
+      }
+    ]
+  }))
+})
+
+async function getEnvironment(){
+  const client = getManagementClient()
+  const space = await client.getSpace(spaceId)
+  return space.getEnvironment(environmentId)
+}
+
+const fieldValue = value => ({ [defaultLocale]: value })
+
+export default async function handler(req,res){
   if(!verifyAdmin(req)) return res.status(401).json({error:'Unauthorized'})
 
   if(req.method === 'GET'){
-    const files = fs.readdirSync(contentDir).filter(file => file.endsWith('.md'))
-    const posts = files.map(file => {
-      const slug = file.replace('.md','')
-      const raw = fs.readFileSync(path.join(contentDir,file),'utf8')
-      const { data } = matter(raw)
-      return {
-        slug,
-        title: data.title || slug,
-        date: data.date || null,
-        description: data.description || ''
-      }
-    })
-    return res.status(200).json({ posts })
+    const posts = await fetchBlogEntries({ limit: 200 })
+    return res.status(200).json({ posts: posts.map(post => ({ slug: post.slug, title: post.title, date: post.publishedDate, description: post.description })) })
   }
 
   if(req.method === 'POST'){
-    const { title, description = '', content = '', tags = [], thumbnail = '', date = new Date().toISOString(), slug: providedSlug } = req.body || {}
-    if(!title) return res.status(400).json({error:'Title required'})
+    const { title, description = '', content = '', tags = [], thumbnail = '', ogImage = '', date = new Date().toISOString(), slug: providedSlug, author = 'DexToolbox Research' } = req.body || {}
+    if(!title || !content) return res.status(400).json({error:'Title and content are required'})
     const slug = (providedSlug || title.toLowerCase().replace(/[^a-z0-9]+/g,'-')).replace(/^-+|-+$/g,'')
-    const filePath = path.join(contentDir, `${slug}.md`)
-    if(fs.existsSync(filePath)) return res.status(409).json({error:'Post already exists'})
-    const frontmatter = matter.stringify(content, {
-      title,
-      description,
-      date,
-      tags,
-      thumbnail
+    const env = await getEnvironment()
+    const existing = await env.getEntries({ content_type: 'blogPost', 'fields.slug': slug, limit: 1 })
+    if(existing?.items?.length) return res.status(409).json({error:'Post already exists'})
+
+    const entry = await env.createEntry('blogPost', {
+      fields: {
+        title: fieldValue(title),
+        slug: fieldValue(slug),
+        excerpt: fieldValue(description),
+        seoDescription: fieldValue(description),
+        body: fieldValue(richTextDocument(content)),
+        tags: fieldValue(tags),
+        thumbnail: fieldValue(thumbnail),
+        ogImage: fieldValue(ogImage),
+        publishedDate: fieldValue(date),
+        author: fieldValue(author),
+        readTime: fieldValue(''),
+      }
     })
-    fs.writeFileSync(filePath, frontmatter)
-    return res.status(201).json({ok:true,slug})
+
+    const published = await entry.publish()
+    return res.status(201).json({ok:true, slug: published.fields.slug[defaultLocale]})
   }
 
   if(req.method === 'DELETE'){
     const { slug } = req.query
     if(!slug) return res.status(400).json({error:'Slug required'})
-    const filePath = path.join(contentDir, `${slug}.md`)
-    if(!fs.existsSync(filePath)) return res.status(404).json({error:'Not found'})
-    fs.unlinkSync(filePath)
+    const env = await getEnvironment()
+    const { items } = await env.getEntries({ content_type: 'blogPost', 'fields.slug': slug, limit: 1 })
+    if(!items?.length) return res.status(404).json({error:'Not found'})
+    const entry = await env.getEntry(items[0].sys.id)
+    if(entry.isPublished()){
+      await entry.unpublish()
+    }
+    await entry.delete()
     return res.status(200).json({ok:true})
   }
 
