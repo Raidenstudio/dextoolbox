@@ -9,6 +9,8 @@ export default function App({ Component, pageProps }){
   },[])
 
   useEffect(()=>{
+    if(typeof window === 'undefined') return
+    if(window.location.pathname.startsWith('/admin')) return
     let cleanupNodes = []
     fetch('/api/settings')
       .then(res => res.json())
